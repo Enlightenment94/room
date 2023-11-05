@@ -1,0 +1,59 @@
+#myPrivKey{
+	font-size: 7px;
+}
+#myPubKey{
+	font-size: 10px;
+}
+#reciverPubKey{
+	font-size: 10px;
+}
+
+#client{
+	margin: 10px;
+}
+
+#msg{
+	margin: 10px;
+	height: 100px;
+}
+
+body{
+	background-color: black;
+	background-image: url("room.jpg");
+	background-size: cover;
+	color: rgba(255,255,255, 0.8);
+}
+
+input{
+	background: none;
+	color: rgba(255,255,255, 0.8);
+}
+
+textarea{
+	background: none;
+	color: rgba(255,255,255, 0.8);
+}
+
+#loginWindow{
+	position: fixed;
+	top: 150;
+	left: 0;
+	right: 0;
+	margin: auto;
+	width: 50%;
+	transform: translate(0, 0);
+}
+
+#content{
+	width: 600px;
+	margin: 0 auto;
+	display: none;
+}
+
+.col100{
+	width: 100%;
+}
+
+.window{
+
+}
