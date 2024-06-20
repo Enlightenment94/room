@@ -1,3 +1,7 @@
+#clients{
+    padding: 5px;
+}
+
 #myPrivKey{
 	font-size: 7px;
 }
@@ -52,8 +56,5 @@ textarea{
 
 .col100{
 	width: 100%;
-}
-
-.window{
-
+    margin: 5px;
 }

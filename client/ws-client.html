@@ -11,7 +11,7 @@ function connect(){
     content = document.getElementById("loginWindow");
     content.style.display = "none";
 
-    socket = new WebSocket("ws://localhost:8080?room=" + password);
+    socket = new WebSocket("ws://test.room.pl.lndo.site:8080?room=" + password);
 
     socket.addEventListener("open", function(event) {
         socket.send("<tb>backend219</tb>");
@@ -113,7 +113,7 @@ function send(){
     crypt.setPublicKey(pubKey);
     var encryptedText = crypt.encrypt(msg);
 
-    tb = "<tb>";
+    tb  = "<tb>";
     tb += "<instance>send</instance>";
     tb += "<id>" + clientId + "</id>";
     tb += "<msg>" + encryptedText + "</msg>";
@@ -132,7 +132,7 @@ function send(){
 function plsKey(){
     myId  = document.getElementById("my").innerHTML;
     clientId = document.getElementById("client").value;
-    tb = "<tb>";
+    tb  = "<tb>";
     tb += "<instance>pls_key</instance>";
     tb += "<id>" + clientId + "</id>";
     tb += "<msg>" + "" + "</msg>";
@@ -142,7 +142,7 @@ function plsKey(){
 }
 
 function clients(){
-    tb = "<tb>";
+    tb  = "<tb>";
     tb += "<instance>clients</instance>";
     tb += "<id></id>";
     tb += "<msg></msg>";
