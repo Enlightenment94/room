@@ -1,6 +1,8 @@
 <script src='jsencrypt.min.js'></script>
 <script>
 var socket = "";
+var connFlag = "";
+var window = [];
 
 function connect(){
     password = document.getElementById('password').value;
@@ -15,6 +17,7 @@ function connect(){
 
     socket.addEventListener("open", function(event) {
         socket.send("<tb>backend219</tb>");
+        connFlag = 1;
     });
 
     var crypt = new JSEncrypt();
@@ -46,22 +49,38 @@ function connect(){
                 break;
 
             case ("send"):
-                console.log("eee" +response);   
+                console.log("(send): " +response);   
                 break;
 
             case ("msg"):
                 let id = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
                 let msg = xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
-                console.log(response);
+                console.log("(msg): " + response);
                 privKey = document.getElementById("myPrivKey").innerHTML;
                 crypt.setPrivateKey(privKey);
                 decryptedText = crypt.decrypt(msg);
 
+
+
+                var client = document.getElementById(id);
+                if(client){
+                    client.innerHTML += "<div>" + id + ": " + decrutedText + "</div>";
+                }else{
+                    var messagesDiv = document.getElementById("messages");
+                    if (messagesDiv) {
+                        messagesDiv.innerHTML += "<div class='window-msg' id=" + id + "><div>" + id + ": " + decrutedText + "</div></div>";
+                    } else {
+                        console.error('Element o id "messages" nie został znaleziony.');
+                    }
+                }
+
+                /*
                 var newDiv = document.createElement("div");
                 var text = document.createTextNode(id + ":" + decryptedText);
                 newDiv.appendChild(text);
                 var messagesDiv = document.getElementById("messages");
                 messagesDiv.appendChild(newDiv);
+                */
                 break;
 
             case ("pls"):
@@ -121,12 +140,25 @@ function send(){
     tb += "</tb>";
     socket.send(tb);
 
+    /*
     var newDiv = document.createElement("div");
     var text = document.createTextNode(my + ":" + msg);
 
     newDiv.appendChild(text);
     var messagesDiv = document.getElementById("messages");
-    messagesDiv.appendChild(newDiv);
+    messagesDiv.appendChild(newDiv);*/
+
+    var client = document.getElementById(clientId);
+    if(client){
+        client.innerHTML += "<div>" + my + ": " + msg + "</div>";
+    }else{
+        var messagesDiv = document.getElementById("messages");
+        if (messagesDiv) {
+            messagesDiv.innerHTML += "<div class='window-msg' id=" + clientId + "><b>" + clientId + "</b><div>" + my + ": " + msg + "</div></div>";
+        } else {
+            console.error('Element o id "messages" nie został znaleziony.');
+        }
+    }
 }
 
 function plsKey(){
@@ -153,6 +185,18 @@ function clients(){
 
 function getInner(clientId){
     document.getElementById("client").value = clientId;
+    plsKey();
+}
+
+window.onload = function() {
+    connect();
+    var checkConnFlagInterval = setInterval(function() {
+    if (connFlag === 1) {
+            console.log("connFlag == 1");
+            clients();
+            clearInterval(checkConnFlagInterval);
+        }
+    }, 100);
 }
 </script>
 
@@ -185,7 +229,8 @@ function getInner(clientId){
         <div id='reciverPubKey'></div>
     </div>
 
-    <div id='messages'></div>
+    <div id='messages'>
+    </div>
 
     <div id='window'>
         <input id='client' style='width: 100%;'/>

@@ -11,6 +11,8 @@ class WebSocketServer implements MessageComponentInterface {
         $this->connArr = array();
     }
 
+
+
     public function getClientsIds() {
         $response = "";
         $clientsIds = array();
@@ -42,6 +44,9 @@ class WebSocketServer implements MessageComponentInterface {
         }
     }
 
+
+
+
     public function onOpen(ConnectionInterface $conn){
         $password = 'backend219';
         $uri = $conn->httpRequest->getUri();
@@ -71,6 +76,7 @@ class WebSocketServer implements MessageComponentInterface {
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
+        
         echo $msg . "</br>";
         $parsed = array();
         $xml = simplexml_load_string($msg);
@@ -82,8 +88,8 @@ class WebSocketServer implements MessageComponentInterface {
             }
         }
 
-        $instance = $parsed['0'];
-        $clientId = $parsed['1'];
+        $instance  = $parsed['0'];
+        $clientId  = $parsed['1'];
         $parsedMsg = $parsed['2'];
 
         if(count($parsed) == 4){
@@ -92,7 +98,7 @@ class WebSocketServer implements MessageComponentInterface {
 
         switch ($instance) {
             case "pls_key":
-                $pls = "<tb>";
+                $pls  = "<tb>";
                 $pls .= "<instance>pls</instance>";
                 $pls .= "<id>". $clientId ."</id>";
                 $pls .= "<msg>". "" ."</msg>";
@@ -129,7 +135,6 @@ class WebSocketServer implements MessageComponentInterface {
                 $response .= "<instance>default</instance>";
                 $response .= "</tb>";
                 $from->send($response);
-                break;;
                 break;
         }
     }
