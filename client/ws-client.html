@@ -41,7 +41,7 @@ function connect(){
                 let ids = xmlDoc.getElementsByTagName("id");
                 for (let i = 0; i < ids.length; i++) {
                     console.log(ids[i].childNodes[0].nodeValue);
-                    clients += "<button onclick=\"getInner('" + ids[i].childNodes[0].nodeValue + "')\">";
+                    clients += "<button class='btn-clients' onclick=\"getInner('" + ids[i].childNodes[0].nodeValue + "')\">";
                     clients += ids[i].childNodes[0].nodeValue + "</br>";
                     clients += "</button>";
                 }
@@ -237,9 +237,16 @@ window.onload = function() {
         <textarea id='msg' style='width: 100%;'>messag435435e</textarea>
     </div>
 
-    <button onclick='send()'>send</button>
-    <button onclick='plsKey()'>plsKey</button>
-    <button onclick='clients()'>clients</button>
+    <div style="display: flex;" class="col100">
+        <div class="col50">
+            <button class="btn-clients btn-down" onclick='send()'>send</button>
+            <button style="display: none;" class="btn-clients btn-down" onclick='plsKey()'>plsKey</button>
+            <button style="display: none;" class="btn-clients btn-down" onclick='clients()'>clients</button>
+        </div>
+        <div style="text-align: right;" class="col50">
+            <button class="btn-clients btn-down" onclick='clean()'>clean</button>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">

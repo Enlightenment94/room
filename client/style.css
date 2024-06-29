@@ -59,8 +59,37 @@ textarea{
     margin: 5px;
 }
 
+.col50{
+	width: 50%;
+}
 
+.btn-clients {
+    background-color: #d32f2f; /* Czerwony odcień */
+    color: rgba(255,255,255, 0.8); /* Biały kolor tekstu */
+    border: none; /* Brak obramowania */
+    padding: 3px 6px; /* Wewnętrzne marginesy */
+	margin: 2px;
+    font-size: 11px; /* Rozmiar czcionki */
+    font-weight: bold; /* Pogrubienie tekstu */
+    border-radius: 8px; /* Zaokrąglone rogi */
+    cursor: pointer; /* Zmiana kursora na "wskaźnik" */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Animacja zmiany koloru tła i cienia */
+	width: 190px;
+}
 
+.btn-clients:hover {
+    background-color: #c62828; /* Ciemniejszy odcień czerwieni przy najechaniu */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Cień na przycisku */
+}
+
+.btn-clients:active {
+    background-color: #b71c1c; /* Jeszcze ciemniejszy odcień czerwieni przy kliknięciu */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Mniejszy cień przy kliknięciu */
+}
+
+.btn-down{
+	width: 100px;
+}
 
 .window-msg{
 	width: 200px;

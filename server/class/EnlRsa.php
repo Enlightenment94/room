@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__ . "/EnlAes.php");
 define("PUBLIC_KEY_PATH", __DIR__ . "/../secretDir/" . 'public.key');
 define("PRIVATE_KEY_PATH", __DIR__ . "/../secretDir/" . 'private.key');
 

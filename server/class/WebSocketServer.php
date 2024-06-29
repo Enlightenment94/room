@@ -11,8 +11,6 @@ class WebSocketServer implements MessageComponentInterface {
         $this->connArr = array();
     }
 
-
-
     public function getClientsIds() {
         $response = "";
         $clientsIds = array();

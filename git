@@ -1,6 +1,6 @@
 git init
 git add ./
-git commit -m "reorganize code"
+git commit -m "rebuild and css"
 git branch -M main
 git@github.com:Enlightenment94/room.git
 git push -u origin main
