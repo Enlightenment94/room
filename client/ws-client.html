@@ -64,12 +64,14 @@ function connect(){
 
                 var client = document.getElementById(id);
                 if(client){
-                    client.innerHTML += "<div>" + id + ": " + decryptedText + "</div>";
+                    //client.innerHTML += "<div>" + id + ": " + decryptedText + "</div>";
+                    client.innerHTML += "<div class='cloud-msg'><span class='cloud-msg-header'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div>";
                     windowChat.push(id);
+                    scrollToBottom();
                 }else{
                     var messagesDiv = document.getElementById("messages");
                     if (messagesDiv) {
-                        messagesDiv.innerHTML += "<div class='window-msg' id=" + id + "><div>" + id + ": " + decryptedText + "</div></div>";
+                        messagesDiv.innerHTML += "<div class='window-msg' id=" + id + "><div class='cloud-msg'><span class='cloud-msg-header'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div></div>";
                     } else {
                         console.error('Element o id "messages" nie został znaleziony.');
                     }
@@ -151,12 +153,15 @@ function send(){
 
     var client = document.getElementById(clientId);
     if(client){
-        client.innerHTML += "<div>" + my + ": " + msg + "</div>";
+        //client.innerHTML += "<div>" + my + ": " + msg + "</div>";
+        client.innerHTML += "<div class='cloud-msg'><span class='cloud-msg-header'>" + my + "</span><span class='cloud-msg-content'>" + msg + "</span></div>";
         windowChat.push(clientId);
+        scrollToBottom();
     }else{
         var messagesDiv = document.getElementById("messages");
         if (messagesDiv) {
-            messagesDiv.innerHTML += "<div class='window-msg' id=" + clientId + "><b>" + clientId + "</b><div>" + my + ": " + msg + "</div></div>";
+            //messagesDiv.innerHTML += "<div class='window-msg' id=" + clientId + "><b>" + clientId + "</b><div>" + my + ": " + msg + "</div></div>";
+            messagesDiv.innerHTML += "<div class='window-msg' id=" + clientId + "><div class='cloud-msg'><span class='cloud-msg-header'>" + clientId + "</span><span class='cloud-msg-content'>" + msg + "</span></div></div>";
         } else {
             console.error('Element o id "messages" nie został znaleziony.');
         }
@@ -185,19 +190,37 @@ function clients(){
     socket.send(tb);
 }
 
+function clean(){
+    windowChat.forEach(el => {
+        console.log(el.innerHTML);
+        if (clientId == el) {
+            document.getElementById(el).innerHTML = '';       
+        } else {
+            document.getElementById(el).innerHTML = '';       
+        }
+    });
+}
+
 function getInner(clientId){
     console.log("getInner")
     document.getElementById("client").value = clientId;
     
+    document.getElementById("receiver").innerHTML = clientId;     
+
     windowChat.forEach(el => {
         console.log(el.innerHTML);
         if (clientId == el) {
-            document.getElementById(el).style.display = 'block';
+            document.getElementById(el).style.display = 'block';       
         } else {
             document.getElementById(el).style.display = 'none';
         }
     });
     plsKey();
+}
+
+function scrollToBottom() {
+    const messages = document.getElementById('messages');
+    messages.scrollTop = messages.scrollHeight;
 }
 
 window.onload = function() {
@@ -243,7 +266,11 @@ window.onload = function() {
         </div>
     </span>
 
-    <div id='messages'></div>
+    <h1 style="text-align: center;">407</h1>
+
+    <div id="receiver"></div>
+
+    <div id='messages'></div>    
 
     <div id='window'>
         <textarea id='msg'>messag435435e</textarea>
