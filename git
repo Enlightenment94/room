@@ -1,6 +1,6 @@
 git init
-git add ./
-git commit -m "rebuild and css"
+git add .
+git commit -m "edit chat look, solve delte clients not conn"
 git branch -M main
 git@github.com:Enlightenment94/room.git
 git push -u origin main

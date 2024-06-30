@@ -67,7 +67,11 @@ class WebSocketServer implements MessageComponentInterface {
     }
 
     public function onClose(ConnectionInterface $conn) {
+        if ($this->clients->contains($conn)) {
+            $this->clients->detach($conn);
+        }
 
+        echo "Connection {$conn->resourceId} has disconnected.\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {

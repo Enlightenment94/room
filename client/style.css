@@ -1,5 +1,5 @@
 #clients{
-    padding: 5px;
+	width: 100%;
 }
 
 #myPrivKey{
@@ -16,24 +16,40 @@
 	margin: 10px;
 }
 
-#msg{
-	margin: 10px;
-	height: 100px;
+#msg {
+    background: rgba(50, 50, 50, 0.8); /* Lekko przezroczyste tło */
+    color: rgba(255, 255, 255, 0.8); /* Biały tekst */
+    height: 50px; /* Wyższe pole dla textarea */
+    width: calc(100% - 10px); /* Szerokość pola uwzględniająca padding */
+    margin: 10px; /* Odstęp zewnętrzny */
+    padding: 10px; /* Odstęp wewnętrzny */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Delikatna ramka */
+    border-radius: 8px; /* Zaokrąglone rogi */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Cień */
+    font-family: Arial, sans-serif; /* Czcionka */
+    font-size: 16px; /* Rozmiar czcionki */
+    outline: none; /* Usunięcie domyślnego konturu */
+    transition: background 0.3s, border-color 0.3s; /* Płynne przejścia */
+    box-sizing: border-box; /* Ustawienie box-sizing */
+    resize: none; /* Brak możliwości zmiany rozmiaru */
+}
+
+/* Styl dla obu podczas focus */
+#msg:focus,
+textarea#msg:focus {
+    background: rgba(70, 70, 70, 0.8); /* Zmiana tła przy focus */
+    border-color: rgba(255, 255, 255, 0.5); /* Zmiana koloru ramki przy focus */
 }
 
 body{
 	background-color: black;
 	background-image: url("room.jpg");
 	background-size: cover;
+	background-position: 20px center; 
 	color: rgba(255,255,255, 0.8);
 }
 
 input{
-	background: none;
-	color: rgba(255,255,255, 0.8);
-}
-
-textarea{
 	background: none;
 	color: rgba(255,255,255, 0.8);
 }
@@ -49,7 +65,7 @@ textarea{
 }
 
 #content{
-	width: 600px;
+	width: 250px;
 	margin: 0 auto;
 	display: none;
 }
@@ -74,7 +90,7 @@ textarea{
     border-radius: 8px; /* Zaokrąglone rogi */
     cursor: pointer; /* Zmiana kursora na "wskaźnik" */
     transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Animacja zmiany koloru tła i cienia */
-	width: 190px;
+	width: calc(100% - 5px);
 }
 
 .btn-clients:hover {
@@ -99,4 +115,27 @@ textarea{
 
 #messages{
 	display: inline-block;
+	
+}
+
+#messages {
+    background: rgba(50, 50, 50, 0.8); /* Lekko przezroczyste tło */
+    color: rgba(255, 255, 255, 0.8);
+    height: 200px;
+    width: calc(100% - 35px); /* Upewnij się, że szerokość uwzględnia padding i border */
+    margin: 10px;
+    padding: 10px; /* Wewnętrzny odstęp */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Delikatna ramka */
+    border-radius: 8px; /* Zaokrąglone rogi */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Cień dla efektu głębi */
+    font-family: Arial, sans-serif; /* Przyjazna dla oka czcionka */
+    font-size: 16px; /* Rozmiar czcionki */
+    outline: none; /* Usunięcie konturu */
+    transition: background 0.3s, border-color 0.3s; /* Płynne przejścia */
+	overflow-y: scroll;
+}
+
+#messages:focus {
+    background: rgba(70, 70, 70, 0.8); /* Zmiana tła przy fokusie */
+    border-color: rgba(255, 255, 255, 0.5); /* Zmiana koloru ramki przy fokusie */
 }

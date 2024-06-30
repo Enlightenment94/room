@@ -2,7 +2,7 @@
 <script>
 var socket = "";
 var connFlag = "";
-var window = [];
+var windowChat = [];
 
 function connect(){
     password = document.getElementById('password').value;
@@ -64,11 +64,12 @@ function connect(){
 
                 var client = document.getElementById(id);
                 if(client){
-                    client.innerHTML += "<div>" + id + ": " + decrutedText + "</div>";
+                    client.innerHTML += "<div>" + id + ": " + decryptedText + "</div>";
+                    windowChat.push(id);
                 }else{
                     var messagesDiv = document.getElementById("messages");
                     if (messagesDiv) {
-                        messagesDiv.innerHTML += "<div class='window-msg' id=" + id + "><div>" + id + ": " + decrutedText + "</div></div>";
+                        messagesDiv.innerHTML += "<div class='window-msg' id=" + id + "><div>" + id + ": " + decryptedText + "</div></div>";
                     } else {
                         console.error('Element o id "messages" nie został znaleziony.');
                     }
@@ -151,6 +152,7 @@ function send(){
     var client = document.getElementById(clientId);
     if(client){
         client.innerHTML += "<div>" + my + ": " + msg + "</div>";
+        windowChat.push(clientId);
     }else{
         var messagesDiv = document.getElementById("messages");
         if (messagesDiv) {
@@ -184,7 +186,17 @@ function clients(){
 }
 
 function getInner(clientId){
+    console.log("getInner")
     document.getElementById("client").value = clientId;
+    
+    windowChat.forEach(el => {
+        console.log(el.innerHTML);
+        if (clientId == el) {
+            document.getElementById(el).style.display = 'block';
+        } else {
+            document.getElementById(el).style.display = 'none';
+        }
+    });
     plsKey();
 }
 
@@ -211,42 +223,41 @@ window.onload = function() {
 </div>
 
 <div id='content'>
-    <div id='clients'></div>
-    <div id='my' style='font-weight: bold;'></div>
+    <span style="display: none;" id="info">
+        <div id='my' style='font-weight: bold;'></div>
 
-    <div class='col100'>
-        <b>MyPrivate:</b></br>
-        <div id='myPrivKey'></div>
-    </div>
+        <div class='col100'>
+            <b>MyPrivate:</b></br>
+            <div id='myPrivKey'></div>
+        </div>
 
-    <div class='col100'>
-        <b>MyPublic:</b></br>
-        <div id='myPubKey'></div>
-    </div>
+        <div class='col100'>
+            <b>MyPublic:</b></br>
+            <div id='myPubKey'></div>
+        </div>
 
-    <div class='col100'>
-        <b>Reciver:</b></br>
-        <div id='reciverPubKey'></div>
-    </div>
+        <div class='col100'>
+            <b>Reciver:</b></br>
+            <div id='reciverPubKey'></div>
+            <input id='client' style='width: 100%;'/>
+        </div>
+    </span>
 
-    <div id='messages'>
-    </div>
+    <div id='messages'></div>
 
     <div id='window'>
-        <input id='client' style='width: 100%;'/>
-        <textarea id='msg' style='width: 100%;'>messag435435e</textarea>
+        <textarea id='msg'>messag435435e</textarea>
     </div>
 
     <div style="display: flex;" class="col100">
-        <div class="col50">
-            <button class="btn-clients btn-down" onclick='send()'>send</button>
-            <button style="display: none;" class="btn-clients btn-down" onclick='plsKey()'>plsKey</button>
-            <button style="display: none;" class="btn-clients btn-down" onclick='clients()'>clients</button>
-        </div>
-        <div style="text-align: right;" class="col50">
-            <button class="btn-clients btn-down" onclick='clean()'>clean</button>
-        </div>
+        <button class="btn-clients btn-down" onclick='send()'>send</button>
+        <button style="display: block;" class="btn-clients btn-down" onclick='clients()'>clients</button>
+        <button style="display: none;" class="btn-clients btn-down" onclick='plsKey()'>plsKey</button>
+        <button class="btn-clients btn-down" onclick='clean()'>clean</button>
     </div>
+
+    <div id='clients' class="col100"></div>
+
 </div>
 
 <script type="text/javascript">
