@@ -41,7 +41,7 @@ function connect(){
                 let ids = xmlDoc.getElementsByTagName("id");
                 for (let i = 0; i < ids.length; i++) {
                     console.log(ids[i].childNodes[0].nodeValue);
-                    clients += "<button class='btn-clients' onclick=\"getInner('" + ids[i].childNodes[0].nodeValue + "')\">";
+                    clients += "<button class='cli btn-clients' onclick=\"getInner('" + ids[i].childNodes[0].nodeValue + "')\">";
                     clients += ids[i].childNodes[0].nodeValue + "</br>";
                     clients += "</button>";
                 }
@@ -277,8 +277,8 @@ window.onload = function() {
     </div>
 
     <div style="display: flex;" class="col100">
-        <button class="btn-clients btn-down" onclick='send()'>send</button>
-        <button style="display: block;" class="btn-clients btn-down" onclick='clients()'>clients</button>
+        <button id="btn-send" class="btn-clients btn-down" onclick='send()'>send</button>
+        <button id="btn-load-clients" style="display: block;" class="btn-clients btn-down" onclick='clients()'>clients</button>
         <button style="display: none;" class="btn-clients btn-down" onclick='plsKey()'>plsKey</button>
         <button class="btn-clients btn-down" onclick='clean()'>clean</button>
     </div>
