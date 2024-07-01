@@ -2,5 +2,5 @@ git init
 git add .
 git commit -m "change"
 git branch -M main
-git remote git@github.com:Enlightenment94/room.git
+git remote add origin git@github.com:Enlightenment94/room.git
 git push -u origin main
