@@ -1,6 +1,6 @@
 git init
 git add .
-git commit -m "change"
+git commit -m "next test"
 git branch -M main
 git remote add origin git@github.com:Enlightenment94/room.git
 git push -u origin main

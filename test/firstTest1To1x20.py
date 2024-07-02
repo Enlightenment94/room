@@ -25,7 +25,7 @@ def interact_with_elements(driver, wait, offset):
         
         btn_send = wait.until(EC.presence_of_element_located((By.ID, 'btn-send')))
         
-        for _ in range(10):
+        for _ in range(1):
             btn_msg = wait.until(EC.presence_of_element_located((By.ID, 'msg')))
             random_text = generate_random_text()
             btn_msg.send_keys(random_text)
@@ -51,15 +51,16 @@ def open_browser():
         driver.switch_to.window(driver.window_handles[1])
         driver.get('file:///home/vel/2a-enl/4-Room/www/client/ws-client.html')
         
-        wait = WebDriverWait(driver, 10)
-        
-        interact_with_elements(driver, wait, -2)
+        for _ in range(20):
+            wait = WebDriverWait(driver, 1)
+            
+            interact_with_elements(driver, wait, -2)
 
-        driver.switch_to.window(driver.window_handles[0])
-        
-        btn_load_clients = wait.until(EC.presence_of_element_located((By.ID, 'btn-load-clients')))
-        btn_load_clients.click()
-        interact_with_elements(driver, wait, -1)
+            driver.switch_to.window(driver.window_handles[0])
+            
+            btn_load_clients = wait.until(EC.presence_of_element_located((By.ID, 'btn-load-clients')))
+            btn_load_clients.click()
+            interact_with_elements(driver, wait, -1)
         
         time.sleep(5)
 
