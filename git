@@ -2,5 +2,6 @@ git init
 git add .
 git commit -m "next test"
 git branch -M main
+git remote remove origin
 git remote add origin git@github.com:Enlightenment94/room.git
 git push -u origin main
