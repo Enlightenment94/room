@@ -13,9 +13,17 @@ function connect(){
     content = document.getElementById("loginWindow");
     content.style.display = "none";
 
+    pubKey = getServerPublicKey();
+    
+
+    var crypt = new JSEncrypt();
+    crypt.setPublicKey(pubKey);    
+    var encryptedText = crypt.encrypt(msg);
+    
+
     socket = new WebSocket("ws://test.room.pl.lndo.site:8080?room=" + password);
 
-    socket.addEventListener("open", function(event) {
+    socket.addEventListener("open", function(event) {        
         socket.send("<tb>backend219</tb>");
         connFlag = 1;
     });
@@ -178,6 +186,20 @@ function plsKey(){
     tb += "<mid>" + myId + "</mid>";
     tb += "</tb>";
     socket.send(tb);
+}
+
+async function getServerPublicKey() {
+    try {
+        let response = await fetch('http://test.room.pl.lndo.site/server/deliveryKey.php');
+        if (!response.ok) {
+            throw new Error('Błąd: ' + response.status);
+        }
+        let text = await response.text();
+        return text;
+    } catch (error) {
+        console.error('Wystąpił błąd: ' + error);
+        throw error;  // Możesz też rzucić wyjątek, jeśli chcesz go obsłużyć poza funkcją
+    }
 }
 
 function clients(){

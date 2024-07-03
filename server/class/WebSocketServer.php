@@ -2,6 +2,8 @@
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
+require_once("EnlRsa.php");
+
 class WebSocketServer implements MessageComponentInterface {
     protected $clients;
     protected $connArr;
@@ -43,13 +45,14 @@ class WebSocketServer implements MessageComponentInterface {
     }
 
 
-
-
-    public function onOpen(ConnectionInterface $conn){
+    public function onOpen(ConnectionInterface $conn){        
         $password = 'backend219';
         $uri = $conn->httpRequest->getUri();
         parse_str($uri->getQuery(), $params);
         $clientPassword = $params['room'];
+
+        $enlRsa = new EnlRsa();
+
         if ($clientPassword !== $password) {
             $conn->close();
             return;
