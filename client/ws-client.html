@@ -13,124 +13,154 @@ function connect(){
     content = document.getElementById("loginWindow");
     content.style.display = "none";
 
-    pubKey = getServerPublicKey();
-    
+    /*
+    sessionKey = getServerKey();
+    console.log("Session Key");
+    console.log(sessionKey);
 
-    var crypt = new JSEncrypt();
-    crypt.setPublicKey(pubKey);    
-    var encryptedText = crypt.encrypt(msg);
-    
+    if (typeof sessionKey === 'string') {
+        console.log('sessionKey jest stringiem');
+    } else {
+        console.log('sessionKey nie jest stringiem');
+    }
 
-    socket = new WebSocket("ws://test.room.pl.lndo.site:8080?room=" + password);
+    let pattern = /<session>(.*?)<\/session><field>(.*?)<\/field>/s;
+    let matches = sessionKey.match(pattern);
 
-    socket.addEventListener("open", function(event) {        
-        socket.send("<tb>backend219</tb>");
-        connFlag = 1;
-    });
+    if (matches) {
+        let session = matches[1];  
+        let field = matches[2];    
+        
+        console.log("Session:", session);
+        console.log("Field:", field);
+    } else {
+        console.log("Bad prase!");
+    }*/
 
-    var crypt = new JSEncrypt();
+    getServerKey()
+    .then(text => {
+        console.log('Otrzymany tekst:', text);
+        let parser = new DOMParser();
+        let xmlDoc = parser.parseFromString(text, "application/xml");
+        let session = xmlDoc.getElementsByTagName("session")[0]?.textContent;
+        let field = xmlDoc.getElementsByTagName("field")[0]?.textContent;        
+        console.log("Session:", session);
+        console.log("Field:", field);
 
-    socket.addEventListener("message", function(event) {
-        let response = event.data; 
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(response,"text/xml");
+        socket = new WebSocket("ws://test.room.pl.lndo.site:8080?room=" + password);
 
-        let instance = xmlDoc.getElementsByTagName("instance")[0].childNodes[0].nodeValue;
-        console.log(instance);
+        socket.addEventListener("open", function(event) {        
+            socket.send("<tb>backend219</tb>");
+            connFlag = 1;
+        });
 
-        let clients = "";
-        switch (instance){
-            case ("you"):
-                let myId = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
-                document.getElementById("my").innerHTML = myId;
-                break;
+        var crypt = new JSEncrypt();
 
-            case ("clients"):
-                let ids = xmlDoc.getElementsByTagName("id");
-                for (let i = 0; i < ids.length; i++) {
-                    console.log(ids[i].childNodes[0].nodeValue);
-                    clients += "<button class='cli btn-clients' onclick=\"getInner('" + ids[i].childNodes[0].nodeValue + "')\">";
-                    clients += ids[i].childNodes[0].nodeValue + "</br>";
-                    clients += "</button>";
-                }
-                document.getElementById("clients").innerHTML = clients;
-                break;
+        socket.addEventListener("message", function(event) {
+            let response = event.data; 
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(response,"text/xml");
 
-            case ("send"):
-                console.log("(send): " +response);   
-                break;
+            let instance = xmlDoc.getElementsByTagName("instance")[0].childNodes[0].nodeValue;
+            console.log(instance);
 
-            case ("msg"):
-                let id = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
-                let msg = xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
-                console.log("(msg): " + response);
-                privKey = document.getElementById("myPrivKey").innerHTML;
-                crypt.setPrivateKey(privKey);
-                decryptedText = crypt.decrypt(msg);
+            let clients = "";
+            switch (instance){
+                case ("you"):
+                    let myId = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
+                    document.getElementById("my").innerHTML = myId;
+                    break;
 
-
-
-                var client = document.getElementById(id);
-                if(client){
-                    //client.innerHTML += "<div>" + id + ": " + decryptedText + "</div>";
-                    client.innerHTML += "<div class='cloud-msg'><span class='cloud-msg-header'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div>";
-                    windowChat.push(id);
-                    scrollToBottom();
-                }else{
-                    var messagesDiv = document.getElementById("messages");
-                    if (messagesDiv) {
-                        messagesDiv.innerHTML += "<div class='window-msg' id=" + id + "><div class='cloud-msg'><span class='cloud-msg-header'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div></div>";
-                    } else {
-                        console.error('Element o id "messages" nie został znaleziony.');
+                case ("clients"):
+                    let ids = xmlDoc.getElementsByTagName("id");
+                    for (let i = 0; i < ids.length; i++) {
+                        console.log(ids[i].childNodes[0].nodeValue);
+                        clients += "<button class='cli btn-clients' onclick=\"getInner('" + ids[i].childNodes[0].nodeValue + "')\">";
+                        clients += ids[i].childNodes[0].nodeValue + "</br>";
+                        clients += "</button>";
                     }
-                }
+                    document.getElementById("clients").innerHTML = clients;
+                    break;
 
-                /*
-                var newDiv = document.createElement("div");
-                var text = document.createTextNode(id + ":" + decryptedText);
-                newDiv.appendChild(text);
-                var messagesDiv = document.getElementById("messages");
-                messagesDiv.appendChild(newDiv);
-                */
-                break;
+                case ("send"):
+                    console.log("(send): " +response);   
+                    break;
 
-            case ("pls"):
-                clientId = xmlDoc.getElementsByTagName("mid")[0].childNodes[0].nodeValue;;
-                myPubKey = document.getElementById("myPubKey").innerHTML;
-                console.log("pls: " + clientId);
-                tb = "<tb>";
-                tb += "<instance>key</instance>";
-                tb += "<id>" + clientId + "</id>";
-                tb += "<msg>" + myPubKey + "</msg>";
-                tb += "<mid>" + clientId + "</mid>";
-                tb += "</tb>";
-                socket.send(tb);
-                break;
+                case ("msg"):
+                    let id = xmlDoc.getElementsByTagName("id")[0].childNodes[0].nodeValue;
+                    let msg = xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
+                    console.log("(msg): " + response);
+                    privKey = document.getElementById("myPrivKey").innerHTML;
+                    crypt.setPrivateKey(privKey);
+                    decryptedText = crypt.decrypt(msg);
 
-            case ("key"):
-                console.log(response);
-                let reciverPubKey = xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
-                document.getElementById("reciverPubKey").innerHTML = reciverPubKey;
-                break;   
 
-            default:
-                console.log(response);
-                break;
-        }
-    });
 
-    socket.addEventListener("close", function(event) {
-        console.log("conn closed");
-        let content = document.getElementById("content");
-        content.style.display = "none"; 
+                    var client = document.getElementById(id);
+                    if(client){
+                        //client.innerHTML += "<div>" + id + ": " + decryptedText + "</div>";
+                        client.innerHTML += "<div class='cloud-msg'><span class='cloud-msg-header'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div>";
+                        windowChat.push(id);
+                        scrollToBottom();
+                    }else{
+                        var messagesDiv = document.getElementById("messages");
+                        if (messagesDiv) {
+                            messagesDiv.innerHTML += "<div class='window-msg' id=" + id + "><div class='cloud-msg'><span class='cloud-msg-header'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div></div>";
+                        } else {
+                            console.error('Element o id "messages" nie został znaleziony.');
+                        }
+                    }
 
-        content = document.getElementById("loginWindow");
-        content.style.display = "block";
-    });
+                    /*
+                    var newDiv = document.createElement("div");
+                    var text = document.createTextNode(id + ":" + decryptedText);
+                    newDiv.appendChild(text);
+                    var messagesDiv = document.getElementById("messages");
+                    messagesDiv.appendChild(newDiv);
+                    */
+                    break;
 
-    socket.addEventListener("error", function(event) {
-        console.log("error");
-    });
+                case ("pls"):
+                    clientId = xmlDoc.getElementsByTagName("mid")[0].childNodes[0].nodeValue;;
+                    myPubKey = document.getElementById("myPubKey").innerHTML;
+                    console.log("pls: " + clientId);
+                    tb = "<tb>";
+                    tb += "<instance>key</instance>";
+                    tb += "<id>" + clientId + "</id>";
+                    tb += "<msg>" + myPubKey + "</msg>";
+                    tb += "<mid>" + clientId + "</mid>";
+                    tb += "</tb>";
+                    socket.send(tb);
+                    break;
+
+                case ("key"):
+                    console.log(response);
+                    let reciverPubKey = xmlDoc.getElementsByTagName("msg")[0].childNodes[0].nodeValue;
+                    document.getElementById("reciverPubKey").innerHTML = reciverPubKey;
+                    break;   
+
+                default:
+                    console.log(response);
+                    break;
+            }
+        });
+
+        socket.addEventListener("close", function(event) {
+            console.log("conn closed");
+            let content = document.getElementById("content");
+            content.style.display = "none"; 
+
+            content = document.getElementById("loginWindow");
+            content.style.display = "block";
+        });
+
+        socket.addEventListener("error", function(event) {
+            console.log("error");
+        });
+    })
+    .catch(error => {
+        console.error('Error getServerKey:', error);
+    });    
 }
 
 function send(){
@@ -188,9 +218,11 @@ function plsKey(){
     socket.send(tb);
 }
 
-async function getServerPublicKey() {
+async function getServerKey() {
     try {
-        let response = await fetch('http://test.room.pl.lndo.site/server/deliveryKey.php');
+        let publicKey = document.getElementById("myPubKey").innerHTML
+        let encodedPublicKey = encodeURIComponent(publicKey);
+        let response = await fetch(`http://test.room.pl.lndo.site/server/deliveryKey.php?pk=${encodedPublicKey}`);
         if (!response.ok) {
             throw new Error('Błąd: ' + response.status);
         }

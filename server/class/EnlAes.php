@@ -4,6 +4,15 @@ class EnlAes{
 
 	public $sp;
 
+	public static function generateKey($length = 256) {
+        if (!in_array($length, [128, 192, 256])) {
+            throw new InvalidArgumentException('Invalid key length. Allowed lengths are 128, 192, or 256 bits.');
+        }
+        $bytes = $length / 8;
+        $key = random_bytes($bytes);
+        return bin2hex($key);
+    }
+
 	public function __construct($sp = ""){
 		if($sp == ""){
 			$sp = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';	

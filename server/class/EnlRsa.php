@@ -68,9 +68,11 @@ class EnlRsa{
 	    }
 	}
 
-	public function rsaEncrypt($plainText){
+	public function rsaEncrypt($plainText, $publicKey = ""){
 		$encryptedText = "";
-		$publicKey = file_get_contents(PUBLIC_KEY_PATH);
+		if($publicKey == ""){
+			$publicKey = file_get_contents(PUBLIC_KEY_PATH);
+		}
 		openssl_public_encrypt($plainText, $encryptedText, $publicKey);
 		return $encryptedText;
 	}

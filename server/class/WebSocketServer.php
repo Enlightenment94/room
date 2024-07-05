@@ -51,8 +51,6 @@ class WebSocketServer implements MessageComponentInterface {
         parse_str($uri->getQuery(), $params);
         $clientPassword = $params['room'];
 
-        $enlRsa = new EnlRsa();
-
         if ($clientPassword !== $password) {
             $conn->close();
             return;
