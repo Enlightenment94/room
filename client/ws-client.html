@@ -13,30 +13,6 @@ function connect(){
     content = document.getElementById("loginWindow");
     content.style.display = "none";
 
-    /*
-    sessionKey = getServerKey();
-    console.log("Session Key");
-    console.log(sessionKey);
-
-    if (typeof sessionKey === 'string') {
-        console.log('sessionKey jest stringiem');
-    } else {
-        console.log('sessionKey nie jest stringiem');
-    }
-
-    let pattern = /<session>(.*?)<\/session><field>(.*?)<\/field>/s;
-    let matches = sessionKey.match(pattern);
-
-    if (matches) {
-        let session = matches[1];  
-        let field = matches[2];    
-        
-        console.log("Session:", session);
-        console.log("Field:", field);
-    } else {
-        console.log("Bad prase!");
-    }*/
-
     getServerKey()
     .then(text => {
         console.log('Otrzymany tekst:', text);
@@ -47,14 +23,19 @@ function connect(){
         console.log("Session:", session);
         console.log("Field:", field);
 
-        socket = new WebSocket("ws://test.room.pl.lndo.site:8080?room=" + password);
+        var crypt = new JSEncrypt();
+        var crypt = new JSEncrypt();
+        privKey = document.getElementById("myPrivKey").innerHTML;
+        crypt.setPrivateKey(privKey);
+        decryptedText = crypt.decrypt(field);
+        
+
+        socket = new WebSocket("ws://test.room.pl.lndo.site:8080?room=" + password + "&session=" + session);
 
         socket.addEventListener("open", function(event) {        
             socket.send("<tb>backend219</tb>");
             connFlag = 1;
         });
-
-        var crypt = new JSEncrypt();
 
         socket.addEventListener("message", function(event) {
             let response = event.data; 
