@@ -24,3 +24,9 @@ git commit -m "Find lib to AES js"
 git branch -M main
 git remote set-url origin git@github-enlightenment:Enlightenment94/room.git
 git push -u origin main
+
+git add .
+git commit -m "Try secure login to server"
+git branch -M main
+git remote set-url origin git@github-enlightenment:Enlightenment94/room.git
+git push -u origin main

@@ -1,6 +1,7 @@
 <?php
 
 //ini_set("display_errors", true);
+header('Content-Type: text/xml; charset=UTF-8');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -20,17 +21,24 @@ function generateRandomString($length = 32, $characters = '0123456789abcdefghijk
 }
 
 if( isset($_GET['pk']) ){
-    $publicKey = $_GET['pk'];
-    //Zweryfikuj czy to poprawny klucz
+    $publicKey = $_GET['pk'];    
+    $prvKey = $_GET['prk'];
     $session = generateRandomString();
     $filePath = __DIR__. "/sessions/" . $session;
     $aesKey = EnlAes::generateKey();
-    $enlRsa = new EnlRsa();
     file_put_contents($filePath, $aesKey);
+
+    $enlRsa = new EnlRsa();    
     $aesKeyEncryptedByRsa = $enlRsa->rsaEncrypt($aesKey, $publicKey);
+    $aesKeyDecryptedByRsa = $enlRsa->rsaDecrypt($aesKeyEncryptedByRsa, $prvKey);
+    $encoded = base64_encode($aesKeyEncryptedByRsa);
+
 
     echo "<response>" .
          "<session>$session</session>" .
-         "<field>$aesKeyEncryptedByRsa</field>" .
+         //"<field>$aesKeyEncryptedByRsa</field>" .
+         "<field>$encoded</field>" .         
+         "<dec>$aesKeyDecryptedByRsa</dec>" .
+         "<plus>+</plus>".
          "</response>";
 }

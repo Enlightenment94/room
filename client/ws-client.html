@@ -1,4 +1,7 @@
 <script src='jsencrypt.min.js'></script>
+
+<script src="crypto-js.min.js"></script>
+
 <script>
 var socket = "";
 var connFlag = "";
@@ -15,22 +18,81 @@ function connect(){
 
     getServerKey()
     .then(text => {
-        console.log('Otrzymany tekst:', text);
+        console.log(text);
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(text, "application/xml");
         let session = xmlDoc.getElementsByTagName("session")[0]?.textContent;
-        let field = xmlDoc.getElementsByTagName("field")[0]?.textContent;        
-        console.log("Session:", session);
-        console.log("Field:", field);
 
-        var crypt = new JSEncrypt();
+        /*
+        let fieldContent = xmlDoc.getElementsByTagName("field")[0]?.textContent;
+        if (!fieldContent) {
+            console.error("field not exist");
+        } else {
+            console.log("<field>:", fieldContent);
+        }*/
+
+        let fieldMatch = text.match(/<field>([\s\S]*?)<\/field>/);
+
+        let fieldContent = "";
+        if (!fieldMatch) {
+            console.error("Tag <field> not found.");
+        } else if (!fieldMatch[1]) {
+            console.error("Tag <field> is empty.");
+        } else {
+            fieldContent = fieldMatch[1];
+            console.log("<field>:", fieldContent);
+        }
+
+        field = fieldContent;
+
+        //console.log("Session:", session);
+        //console.log("Field:", field);
+
+        let decMatch = text.match(/<dec>([\s\S]*?)<\/dec>/);
+
+        let decContent = "";
+        if (!decMatch) {
+            console.error("Tag <dec> not found.");
+        } else if (!fieldMatch[1]) {
+            console.error("Tag <dec> is empty.");
+        } else {
+            decContent = decMatch[1];
+            console.log("<dec>:", decContent);
+        }
+
         var crypt = new JSEncrypt();
         privKey = document.getElementById("myPrivKey").innerHTML;
         crypt.setPrivateKey(privKey);
-        decryptedText = crypt.decrypt(field);
-        
 
-        socket = new WebSocket("ws://test.room.pl.lndo.site:8080?room=" + password + "&session=" + session);
+        try {
+            console.log("----");
+            console.log(field);
+            var decodedData = atob(field);//CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(field));
+            console.log(decodedData);
+            var decryptedText = crypt.decrypt(decodedData);            
+            console.log(decryptedText);
+            console.log("----");
+
+        } catch (error) {
+            console.error("Błąd podczas deszyfrowania:", error);
+        }
+
+        console.log("DEC");
+        encryptedDecContent = crypt.encrypt(decContent);
+        console.log(encryptedDecContent);
+
+    
+        console.log("Decrypt by RSA ");
+        const aesKey = decryptedText;
+        console.log(aesKey);
+        console.log("AES ENCRYPT")
+        const passwordEncrypted = CryptoJS.AES.encrypt(password, aesKey).toString();
+        console.log();
+        console.log("ws");
+        ws = "ws://test.room.pl.lndo.site:8080?room=" + passwordEncrypted + "&session=" + session;
+        console.log(ws) 
+
+        socket = new WebSocket(ws);
 
         socket.addEventListener("open", function(event) {        
             socket.send("<tb>backend219</tb>");
@@ -40,7 +102,7 @@ function connect(){
         socket.addEventListener("message", function(event) {
             let response = event.data; 
             const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(response,"text/xml");
+            const xmlDoc = parser.parseFromString(response, "text/xml" );
 
             let instance = xmlDoc.getElementsByTagName("instance")[0].childNodes[0].nodeValue;
             console.log(instance);
@@ -201,9 +263,12 @@ function plsKey(){
 
 async function getServerKey() {
     try {
-        let publicKey = document.getElementById("myPubKey").innerHTML
+        let publicKey = document.getElementById("myPubKey").innerHTML;
+        let prvKey = document.getElementById("myPrivKey").innerHTML;
+
         let encodedPublicKey = encodeURIComponent(publicKey);
-        let response = await fetch(`http://test.room.pl.lndo.site/server/deliveryKey.php?pk=${encodedPublicKey}`);
+        let encodedPrvKey = encodeURIComponent(prvKey);
+        let response = await fetch(`http://test.room.pl.lndo.site/server/deliveryKey.php?pk=${encodedPublicKey}&prk=${encodedPrvKey}`);
         if (!response.ok) {
             throw new Error('Błąd: ' + response.status);
         }
