@@ -2,4 +2,31 @@
 	//ajax jsencrypt send public key
 	//ajax decrypt AES Key by priv key
 	//encrypt AES message and send to script
+
+	function ajax(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log("Request successful:", xhr.responseText);
+                } else {
+                    console.log("Request failed with status:", xhr.status);
+                }
+            }
+        };
+
+        xhr.send();
+    }
+
+    window.onload = function{
+        var encrypt = new JSEncrypt({default_key_size: 2048});
+        encrypt.getKey();
+        var privateKey = encrypt.getPrivateKey();
+        var publicKey = encrypt.getPublicKey();
+
+        ajax("session.php?pub=" + publicKey);
+
+    }
 </script>
