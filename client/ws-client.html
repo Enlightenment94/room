@@ -1,11 +1,15 @@
 <script src='jsencrypt.min.js'></script>
-
+<script src="forge.min.js"></script>
 <script src="crypto-js.min.js"></script>
 
 <script>
 var socket = "";
 var connFlag = "";
 var windowChat = [];
+
+let globalPublicKeyPem = "";
+let globalPrivateKeyPem = "";
+let globalKeypair = "";
 
 function connect(){
     password = document.getElementById('password').value;
@@ -23,73 +27,46 @@ function connect(){
         let xmlDoc = parser.parseFromString(text, "application/xml");
         let session = xmlDoc.getElementsByTagName("session")[0]?.textContent;
 
-        /*
-        let fieldContent = xmlDoc.getElementsByTagName("field")[0]?.textContent;
-        if (!fieldContent) {
-            console.error("field not exist");
-        } else {
-            console.log("<field>:", fieldContent);
-        }*/
 
-        let fieldMatch = text.match(/<field>([\s\S]*?)<\/field>/);
+        let encMatch = text.match(/<enc>([\s\S]*?)<\/enc>/);
 
-        let fieldContent = "";
-        if (!fieldMatch) {
-            console.error("Tag <field> not found.");
-        } else if (!fieldMatch[1]) {
-            console.error("Tag <field> is empty.");
+        let encContent = "";
+        if (!encMatch) {
+            console.error("Tag <enc> not found.");
+        } else if (!encMatch[1]) {
+            console.error("Tag <enc> is empty.");
         } else {
-            fieldContent = fieldMatch[1];
-            console.log("<field>:", fieldContent);
+            encContent = encMatch[1];
+            try {
+                //const privateKey = forge.pki.privateKeyFromPem(globalPrivateKeyPem);
+                var encryptedData = forge.util.decode64(encContent);
+                var decryptedMessageAesKey = globalKeypair.privateKey.decrypt(encryptedData, 'RSA-OAEP');
+
+                console.log("<enc>:", decryptedMessageAesKey);
+            } catch (error) {
+                console.error('Błąd odszyfrowania:', error);
+                throw error;
+            }
+            console.log("<enc>:", decryptedMessageAesKey);
+            
         }
 
-        field = fieldContent;
+        function encryptAES(password, keyHex) {
+            const key = CryptoJS.enc.Hex.parse(keyHex);
+            const iv = CryptoJS.lib.WordArray.random(16);
+            const encrypted = CryptoJS.AES.encrypt(password, key, {
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
 
-        //console.log("Session:", session);
-        //console.log("Field:", field);
-
-        let decMatch = text.match(/<dec>([\s\S]*?)<\/dec>/);
-
-        let decContent = "";
-        if (!decMatch) {
-            console.error("Tag <dec> not found.");
-        } else if (!fieldMatch[1]) {
-            console.error("Tag <dec> is empty.");
-        } else {
-            decContent = decMatch[1];
-            console.log("<dec>:", decContent);
+            const ivCiphertext = iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Base64);
+            
+            return ivCiphertext;
         }
 
-        var crypt = new JSEncrypt();
-        privKey = document.getElementById("myPrivKey").innerHTML;
-        crypt.setPrivateKey(privKey);
-
-        try {
-            console.log("----");
-            console.log(field);
-            var decodedData = atob(field);//CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(field));
-            console.log(decodedData);
-            var decryptedText = crypt.decrypt(decodedData);            
-            console.log(decryptedText);
-            console.log("----");
-
-        } catch (error) {
-            console.error("Błąd podczas deszyfrowania:", error);
-        }
-
-        console.log("DEC");
-        encryptedDecContent = crypt.encrypt(decContent);
-        console.log(encryptedDecContent);
-
-    
-        console.log("Decrypt by RSA ");
-        const aesKey = decryptedText;
-        console.log(aesKey);
-        console.log("AES ENCRYPT")
-        const passwordEncrypted = CryptoJS.AES.encrypt(password, aesKey).toString();
-        console.log();
-        console.log("ws");
-        ws = "ws://test.room.pl.lndo.site:8080?room=" + passwordEncrypted + "&session=" + session;
+        const passwordEncrypted = encryptAES(password, decryptedMessageAesKey).toString();
+        ws = "ws://test.room.pl.lndo.site:8080?room=" + encodeURIComponent(passwordEncrypted) + "&session=" + encodeURIComponent(session);
         console.log(ws) 
 
         socket = new WebSocket(ws);
@@ -135,9 +112,7 @@ function connect(){
                     console.log("(msg): " + response);
                     privKey = document.getElementById("myPrivKey").innerHTML;
                     crypt.setPrivateKey(privKey);
-                    decryptedText = crypt.decrypt(msg);
-
-
+                    decryptedText = crypt.decrypt(msg);                    
 
                     var client = document.getElementById(id);
                     if(client){
@@ -153,14 +128,6 @@ function connect(){
                             console.error('Element o id "messages" nie został znaleziony.');
                         }
                     }
-
-                    /*
-                    var newDiv = document.createElement("div");
-                    var text = document.createTextNode(id + ":" + decryptedText);
-                    newDiv.appendChild(text);
-                    var messagesDiv = document.getElementById("messages");
-                    messagesDiv.appendChild(newDiv);
-                    */
                     break;
 
                 case ("pls"):
@@ -224,24 +191,14 @@ function send(){
     tb += "</tb>";
     socket.send(tb);
 
-    /*
-    var newDiv = document.createElement("div");
-    var text = document.createTextNode(my + ":" + msg);
-
-    newDiv.appendChild(text);
-    var messagesDiv = document.getElementById("messages");
-    messagesDiv.appendChild(newDiv);*/
-
     var client = document.getElementById(clientId);
     if(client){
-        //client.innerHTML += "<div>" + my + ": " + msg + "</div>";
         client.innerHTML += "<div class='cloud-msg'><span class='cloud-msg-header'>" + my + "</span><span class='cloud-msg-content'>" + msg + "</span></div>";
         windowChat.push(clientId);
         scrollToBottom();
     }else{
         var messagesDiv = document.getElementById("messages");
         if (messagesDiv) {
-            //messagesDiv.innerHTML += "<div class='window-msg' id=" + clientId + "><b>" + clientId + "</b><div>" + my + ": " + msg + "</div></div>";
             messagesDiv.innerHTML += "<div class='window-msg' id=" + clientId + "><div class='cloud-msg'><span class='cloud-msg-header'>" + clientId + "</span><span class='cloud-msg-content'>" + msg + "</span></div></div>";
         } else {
             console.error('Element o id "messages" nie został znaleziony.');
@@ -263,20 +220,50 @@ function plsKey(){
 
 async function getServerKey() {
     try {
-        let publicKey = document.getElementById("myPubKey").innerHTML;
-        let prvKey = document.getElementById("myPrivKey").innerHTML;
+        // Inicjalizacja zmiennych lokalnych
+        let publicKeyPem = "";
+        let privateKeyPem = "";
 
-        let encodedPublicKey = encodeURIComponent(publicKey);
-        let encodedPrvKey = encodeURIComponent(prvKey);
-        let response = await fetch(`http://test.room.pl.lndo.site/server/deliveryKey.php?pk=${encodedPublicKey}&prk=${encodedPrvKey}`);
+        // Generowanie pary kluczy RSA
+        var rsa = forge.pki.rsa;
+
+        const generateKeyPair = () => {
+            return new Promise((resolve, reject) => {
+                rsa.generateKeyPair({ bits: 2048, e: 0x10001 }, (err, keypair) => {
+                    if (err) {
+                        reject(err);
+                    } else {                        
+                        publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
+                        privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
+
+                        console.log("Public Key (PEM format):\n", publicKeyPem);
+                        console.log("Private Key (PEM format):\n", privateKeyPem);
+
+                        globalPublicKeyPem = publicKeyPem;
+                        globalPrivateKeyPem = privateKeyPem;
+                        globalKeypair = keypair
+
+                        resolve();
+                    }
+                });
+            });
+        };
+
+        await generateKeyPair();
+
+        let encodedPublicKey = encodeURIComponent(btoa(publicKeyPem));
+
+        let response = await fetch(`https://test.room.pl.lndo.site/server/deliveryKey.php?pk=${encodedPublicKey}`);
         if (!response.ok) {
             throw new Error('Błąd: ' + response.status);
         }
+
         let text = await response.text();
+
         return text;
     } catch (error) {
         console.error('Wystąpił błąd: ' + error);
-        throw error;  // Możesz też rzucić wyjątek, jeśli chcesz go obsłużyć poza funkcją
+        throw error;
     }
 }
 

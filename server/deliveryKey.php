@@ -21,24 +21,21 @@ function generateRandomString($length = 32, $characters = '0123456789abcdefghijk
 }
 
 if( isset($_GET['pk']) ){
-    $publicKey = $_GET['pk'];    
-    $prvKey = $_GET['prk'];
+    $publicKey = base64_decode($_GET['pk']); 
     $session = generateRandomString();
     $filePath = __DIR__. "/sessions/" . $session;
     $aesKey = EnlAes::generateKey();
     file_put_contents($filePath, $aesKey);
 
     $enlRsa = new EnlRsa();    
-    $aesKeyEncryptedByRsa = $enlRsa->rsaEncrypt($aesKey, $publicKey);
-    $aesKeyDecryptedByRsa = $enlRsa->rsaDecrypt($aesKeyEncryptedByRsa, $prvKey);
-    $encoded = base64_encode($aesKeyEncryptedByRsa);
+    $aesKeyEncryptByRsa = $enlRsa->rsaEncryptPadding($aesKey, $publicKey, "base");
+    //$aesKeyEncryptByRsa = $enlRsa->rsaEncrypt($aesKey, $publicKey);
 
-
-    echo "<response>" .
+    $response =  "<response>" .
          "<session>$session</session>" .
-         //"<field>$aesKeyEncryptedByRsa</field>" .
-         "<field>$encoded</field>" .         
-         "<dec>$aesKeyDecryptedByRsa</dec>" .
-         "<plus>+</plus>".
+         "<enc>$aesKeyEncryptByRsa</enc>" .
          "</response>";
+
+    echo $response;
+    file_put_contents("here", $response);
 }

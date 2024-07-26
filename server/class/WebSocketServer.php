@@ -47,18 +47,28 @@ class WebSocketServer implements MessageComponentInterface {
 
     public function onOpen(ConnectionInterface $conn){ 
         file_put_contents( __DIR__ ."/debug.log", "Hello");       
+        
         $password = 'backend219';
         $uri = $conn->httpRequest->getUri();
         parse_str($uri->getQuery(), $params);
         $clientPassword = $params['room'];
-        $session = $params['session'];
-
-        file_put_contents( __DIR__ ."/debug.log", $clientPassword . " " . $session);
-        
+        $session = $params['session'];        
 
         $aesKey = file_get_contents( __DIR__ . "/sessions/" . $session);
         $enlAes = new EnlAes($aesKey);
-        $clientPassword = $enlAes->decryptKey($clientPassword, $aesKey);
+        try{
+            $decryptedClientPassword = $enlAes->decryptAES($clientPassword, $aesKey);
+        }catch(Exception $e){
+            file_put_contents( __DIR__ ."/debug.log", $e);
+            echo $e;
+        }
+
+        try{
+            file_put_contents( __DIR__ ."/debug.log", $decryptedClientPassword . " ============= " . $clientPassword . " -------- " . $session);
+        }catch(Exception $e){
+            file_put_contents( __DIR__ ."/debug.log", $e);
+            echo $e;
+        }
 
         if ($clientPassword !== $password) {
             $conn->close();

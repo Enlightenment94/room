@@ -79,17 +79,38 @@ class EnlRsa{
 	    }
 	}
 
-	public function rsaEncrypt($plainText, $publicKey = ""){
+	public function rsaEncrypt($plainText, $publicKey = "", $base = ""){
 		$encryptedText = "";
 		if($publicKey == ""){
 			$publicKey = file_get_contents(PUBLIC_KEY_PATH);
 		}
 
-		$publicKey = openssl_pkey_get_public($publicKey);
+		//$publicKey = openssl_pkey_get_public($publicKey);
 
 		openssl_public_encrypt($plainText, $encryptedText, $publicKey);
 
-		return base64_encode($encryptedText);
+		if($base == "base"){
+			return base64_encode($encryptedText);
+		}else{
+			return $encryptedText;
+		}
+	}
+
+	public function rsaEncryptPadding($plainText, $publicKey = "", $base = ""){
+		$encryptedText = "";
+		if($publicKey == ""){
+			$publicKey = file_get_contents(PUBLIC_KEY_PATH);
+		}
+
+		//$publicKey = openssl_pkey_get_public($publicKey);
+
+		openssl_public_encrypt($plainText, $encryptedText, $publicKey, OPENSSL_PKCS1_OAEP_PADDING);
+
+		if($base == "base"){
+			return base64_encode($encryptedText);
+		}else{
+			return $encryptedText;
+		}
 	}
 	
 	private function renderEncryptionResults($publicKey, $privateKey, $encryptedRsaPrivateKey, $decrytpedRsaPrivateKey, $plainText, $encryptedText, $decryptedText, $sp) {

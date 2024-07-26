@@ -54,4 +54,43 @@ class EnlAes{
 		return $data;
 	}
 
+	public function decryptString($encryptedString, $key) {
+		$method = 'AES-256-CBC';
+	
+		$encryptedData = $encryptedString;
+	
+		$ivSize = openssl_cipher_iv_length($method);
+		$iv = substr($encryptedData, 0, $ivSize);
+	
+		$encryptedContent = substr($encryptedData, $ivSize);
+	
+		$data = openssl_decrypt($encryptedContent, $method, $key, OPENSSL_RAW_DATA, $iv);
+	
+		return $data;
+	}
+
+	function decryptAES($encryptedBase64, $keyHex) {
+		$key = hex2bin($keyHex);
+	
+		// Decode the Base64 encoded string to get raw data
+		$decodedData = base64_decode($encryptedBase64);
+	
+		// Extract the IV (first 16 bytes for AES-256-CBC)
+		$ivSize = openssl_cipher_iv_length('aes-256-cbc');
+		$iv = substr($decodedData, 0, $ivSize);
+	
+		// Extract the ciphertext
+		$ciphertext = substr($decodedData, $ivSize);
+	
+		// Decrypt the ciphertext
+		$decrypted = openssl_decrypt($ciphertext, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
+	
+		if ($decrypted === false) {
+			echo "Decryption failed: " . openssl_error_string() . "\n";
+			return null;
+		}
+	
+		return $decrypted;
+	}
+
 }
