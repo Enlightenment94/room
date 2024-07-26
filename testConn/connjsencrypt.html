@@ -1,16 +1,19 @@
-<script>
-	//ajax jsencrypt send public key
-	//ajax decrypt AES Key by priv key
-	//encrypt AES message and send to script
+<script src='/../client/jsencrypt.min.js'></script>
+<script src="/../client/crypto-js.min.js"></script>
 
-	function ajax(url) {
+<script>
+    var encrypt = new JSEncrypt({ default_key_size: 2048 });
+    var privateKey = "";
+    var publicKey = "";
+
+    function ajaxSendToken(url, token) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    console.log("Request successful:", xhr.responseText);
+                    alert(xhr.responseText);
                 } else {
                     console.log("Request failed with status:", xhr.status);
                 }
@@ -20,13 +23,61 @@
         xhr.send();
     }
 
-    window.onload = function{
-        var encrypt = new JSEncrypt({default_key_size: 2048});
+    function ajaxPubSrv(url, aesKeyDecrypted) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    var publicKeServer = xhr.responseText;
+                    var encryptedToken = encrypt.encrypt(aesKeyDecrypted);
+                    if (encryptedToken) {
+                        ajaxSendToken("session.php?token=" + encryptedToken);
+                    } else {
+                        console.log("Encryption failed");
+                    }
+                } else {
+                    console.log("Request failed with status:", xhr.status);
+                }
+            }
+        };
+
+        xhr.send();
+    }
+
+    function ajax(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    console.log(privateKey)
+                    console.log("Request successful:", xhr.responseText);                    
+                    var aesKey = xhr.responseText;
+                    console.log(aesKey);                                    
+                    var aesKeyDecrypted = encrypt.decrypt(atob(aesKey));                    
+                    if (aesKeyDecrypted) {
+                        ajaxPubSrv("session.php?pub_srv=t", aesKeyDecrypted);
+                    } else {
+                        console.log("Decryption failed aesKeyDecrypted");
+                    }
+                } else {
+                    console.log("Request failed with status:", xhr.status);
+                }
+            }
+        };
+
+        xhr.send();
+    }
+
+    window.onload = function() {
+        encrypt = new JSEncrypt();
         encrypt.getKey();
-        var privateKey = encrypt.getPrivateKey();
-        var publicKey = encrypt.getPublicKey();
+        privateKey = encrypt.getPrivateKey();
+        publicKey = encrypt.getPublicKey();
 
-        ajax("session.php?pub=" + publicKey);
-
+        ajax("session.php?pub=" + encodeURIComponent(publicKey) );
     }
 </script>

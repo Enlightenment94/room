@@ -5,7 +5,7 @@ define("PUBLIC_KEY_PATH", __DIR__ . "/../secretDir/" . 'public.key');
 define("PRIVATE_KEY_PATH", __DIR__ . "/../secretDir/" . 'private.key');
 
 class EnlRsa{
-	public function genPairKey($sp = ""){
+	public function genPairKey($sp = "", $privateKeyPath = "", $publicKeyPath = ""){
 		$config = array(
 		  "digest_alg" => "sha512",
 		  "private_key_bits" => 2048,
@@ -13,27 +13,37 @@ class EnlRsa{
 		);
 		$res = openssl_pkey_new($config);
 
-		// pobieranie klucza publicznego i prywatnego w formacie PEM
 		$privateKey = "";
 		openssl_pkey_export($res, $privateKey);
 		$publicKey = openssl_pkey_get_details($res)['key'];
 
-		// zaszyfrowanie tekstu
 		$plainText = "Hello world";
 		openssl_public_encrypt($plainText, $encryptedText, $publicKey);
-
-		// odszyfrowanie tekstu
 		openssl_private_decrypt($encryptedText, $decryptedText, $privateKey);
 
 
-		file_put_contents(PRIVATE_KEY_PATH, '');
-		file_put_contents(PRIVATE_KEY_PATH, $privateKey);
+		if($privateKeyPath == ""){
+			$path = PRIVATE_KEY_PATH;
+		}else{
+			$path = $privateKeyPath;
+		}
+
+		if($privateKeyPath == ""){
+			$privateKeyPath = PRIVATE_KEY_PATH;
+		}
+
+		if($publicKeyPath == ""){
+			$publicKeyPath = PUBLIC_KEY_PATH;
+		}
+
+		file_put_contents($path, '');
+		file_put_contents($path, $privateKey);
 
 		$enlAes = new EnlAes();
 		if($sp != ""){
 			$enlAes->setSp($sp);
 		}
-		$encryptedRsaPrivateKey = $enlAes->encryptKey(PRIVATE_KEY_PATH, $enlAes->sp);
+		$encryptedRsaPrivateKey = $enlAes->encryptKey($path, $enlAes->sp);
 
 		/*
 		echo "Klucz publiczny:\n$publicKey\n\n";
@@ -49,11 +59,11 @@ class EnlRsa{
 		echo $enlAes->decryptKey("private.key", $sp);
 		*/
 
-		$decryptedRsaPrivateKey = $enlAes->decryptKey(PRIVATE_KEY_PATH, $enlAes->sp);
+		$decryptedRsaPrivateKey = $enlAes->decryptKey($path, $enlAes->sp);
 		$this->renderEncryptionResults($publicKey, $privateKey, $encryptedRsaPrivateKey, $decryptedRsaPrivateKey, $plainText, $encryptedText, $decryptedText, $enlAes->sp);
 
-		file_put_contents(PUBLIC_KEY_PATH, '');
-		$fp = fopen(PUBLIC_KEY_PATH, "w");
+		file_put_contents($publicKeyPath, '');
+		$fp = fopen($publicKeyPath, "w");
 		fwrite($fp, $publicKey);
 		fclose($fp);
 	}
@@ -74,8 +84,12 @@ class EnlRsa{
 		if($publicKey == ""){
 			$publicKey = file_get_contents(PUBLIC_KEY_PATH);
 		}
+
+		$publicKey = openssl_pkey_get_public($publicKey);
+
 		openssl_public_encrypt($plainText, $encryptedText, $publicKey);
-		return $encryptedText;
+
+		return base64_encode($encryptedText);
 	}
 	
 	private function renderEncryptionResults($publicKey, $privateKey, $encryptedRsaPrivateKey, $decrytpedRsaPrivateKey, $plainText, $encryptedText, $decryptedText, $sp) {

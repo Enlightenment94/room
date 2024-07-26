@@ -1,2 +1,1 @@
-<?php
-//Libs working good
+<script src='connjsencrypt'></script>
