@@ -115,9 +115,37 @@ class WebSocketServer implements MessageComponentInterface {
     public function onError(ConnectionInterface $conn, \Exception $e) {
     }
 
+    public function formatXmlData($xml) {
+        $dom = new DOMDocument();
+        $dom->formatOutput = true; // Enable pretty printing
+        $dom->loadXML($xml);
+        return $dom->saveXML();
+    }
+
     public function onMessage(ConnectionInterface $from, $msg) {
         
-        echo $msg . "</br>";
+        echo "<style>
+            pre {
+                background-color: #f4f4f4;
+                border: 1px solid #ccc;
+                padding: 10px;
+                border-radius: 4px;
+                white-space: pre-wrap;
+                word-break: break-word; 
+                width 100%:  
+            }
+            code {
+                display: block;
+                font-family: Consolas, 'Courier New', monospace;
+                font-size: 14px;
+                color: #333;
+            }
+        </style>";
+
+        echo "<pre><code>";
+        echo htmlspecialchars( $this->formatXmlData($msg) ); 
+        echo "</code></pre>";
+
         $parsed = array();
         $xml = simplexml_load_string($msg);
         foreach ($xml->children() as $element) {
@@ -129,8 +157,18 @@ class WebSocketServer implements MessageComponentInterface {
         }
 
         $instance  = $parsed['0'];
-        $clientId  = $parsed['1'];
-        $parsedMsg = $parsed['2'];
+
+        if(isset($parsed['1'])){
+            $clientId  = $parsed['1'];
+        }else{
+            $clientId  = "";
+        }
+        
+        if(isset($parsed['2'])){
+            $parsedMsg = $parsed['2'];
+        }else{
+            $parsedMsg = "";
+        }
 
         if(count($parsed) == 4){
             $myId = $parsed['3'];
