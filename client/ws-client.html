@@ -22,6 +22,8 @@ function connect(){
 
     getServerKey()
     .then(text => {
+        var crypt = new JSEncrypt();
+
         console.log(text);
         let parser = new DOMParser();
         let xmlDoc = parser.parseFromString(text, "application/xml");
@@ -117,7 +119,7 @@ function connect(){
                     var client = document.getElementById(id);
                     if(client){
                         //client.innerHTML += "<div>" + id + ": " + decryptedText + "</div>";
-                        client.innerHTML += "<div class='cloud-msg'><span class='cloud-msg-header'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div>";
+                        client.innerHTML += "<div class='cloud-msg'><span class='cloud-msg-header recive'>" + id + "</span><span class='cloud-msg-content'>" + decryptedText + "</span></div>";
                         windowChat.push(id);
                         scrollToBottom();
                     }else{

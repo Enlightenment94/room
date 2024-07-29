@@ -54,3 +54,9 @@ git commit -m "Solve AES problem with debug"
 git branch -M main
 git remote set-url origin git@github-enlightenment:Enlightenment94/room.git
 git push -u origin main
+
+git add .
+git commit -m "Style up"
+git branch -M main
+git remote set-url origin git@github-enlightenment:Enlightenment94/room.git
+git push -u origin main
