@@ -69,26 +69,18 @@ class EnlAes{
 		return $data;
 	}
 
-	function decryptAES($encryptedBase64, $keyHex) {
+	function decryptAES($ivCiphertextBase64, $keyHex) {
+		$ivCiphertext = base64_decode($ivCiphertextBase64);
+	
+		$iv = substr($ivCiphertext, 0, 16);
+	
+		$ciphertext = substr($ivCiphertext, 16);
+	
 		$key = hex2bin($keyHex);
+
+		file_put_contents("key.aes", $keyHex . " " . $key);
 	
-		// Decode the Base64 encoded string to get raw data
-		$decodedData = base64_decode($encryptedBase64);
-	
-		// Extract the IV (first 16 bytes for AES-256-CBC)
-		$ivSize = openssl_cipher_iv_length('aes-256-cbc');
-		$iv = substr($decodedData, 0, $ivSize);
-	
-		// Extract the ciphertext
-		$ciphertext = substr($decodedData, $ivSize);
-	
-		// Decrypt the ciphertext
-		$decrypted = openssl_decrypt($ciphertext, 'aes-256-cbc', $key, OPENSSL_RAW_DATA, $iv);
-	
-		if ($decrypted === false) {
-			echo "Decryption failed: " . openssl_error_string() . "\n";
-			return null;
-		}
+		$decrypted = openssl_decrypt($ciphertext, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
 	
 		return $decrypted;
 	}

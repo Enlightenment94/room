@@ -44,6 +44,15 @@ class WebSocketServer implements MessageComponentInterface {
         }
     }
 
+    function search_file($directory, $filename) {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getFilename() === $filename) {
+                return $file->getPathname();
+            }
+        }
+        return false;
+    }
 
     public function onOpen(ConnectionInterface $conn){ 
         file_put_contents( __DIR__ ."/debug.log", "Hello");       
@@ -54,13 +63,22 @@ class WebSocketServer implements MessageComponentInterface {
         $clientPassword = $params['room'];
         $session = $params['session'];        
 
-        $aesKey = file_get_contents( __DIR__ . "/sessions/" . $session);
-        $enlAes = new EnlAes($aesKey);
+        $session = __DIR__ . "/../sessions/" . $session;        
+        $aesKey = file_get_contents($session);
+
+        if( !file_exists($session)){
+            $path = $this->search_file( __DIR__ . "/../" , $session);
+            file_put_contents( __DIR__ ."/debug.log", $path . " " . $session);
+            die("Session File not exist !!!");
+        }
+
+        $enlAes = new EnlAes();
         try{
             $decryptedClientPassword = $enlAes->decryptAES($clientPassword, $aesKey);
         }catch(Exception $e){
             file_put_contents( __DIR__ ."/debug.log", $e);
             echo $e;
+            die();
         }
 
         try{
@@ -70,7 +88,7 @@ class WebSocketServer implements MessageComponentInterface {
             echo $e;
         }
 
-        if ($clientPassword !== $password) {
+        if ($decryptedClientPassword !== $password) {
             $conn->close();
             return;
         }
