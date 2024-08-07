@@ -11,12 +11,15 @@ Php openssl - RSA server
 1. Linux client.
 2. Android client.
 3. IOS client.
-4. Yourself lib RSA - JS.
-5. Yourself lib Websockets.
+4. Yourself lib RSA - Js.
+5. Yourself lib RSA - php.
+6. Yourself lib Websockets.
 
 #### Tasks:
 1. Test Ratchet.
 2. Test Conn clients.
 3. Test encrypt js, php libs.
-4. Complete client-js to Ratchet php.
+4. Complete client-js to Ratchet php. (forge, Jsencrypt, open_ssl..)
+5. Tests client-js on https (bad), bad must make proxy.
+   
 
