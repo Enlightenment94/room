@@ -72,3 +72,15 @@ git commit -m "Readme to correct"
 git branch -M main
 git remote set-url origin git@github-enlightenment:Enlightenment94/room.git
 git push -u origin main
+
+git add . "Test servers wscat"
+git branch -M main
+git remote set-url origin git@github-enlightenment:Enlightenment94/room.git
+git push -u origin main
+
+git add . 
+git commit -m "Some move and newLook"
+git branch -M main
+git remote add origin git@github-enlightenment:Enlightenment94/room.git
+git remote set-url origin git@github-enlightenment:Enlightenment94/room.git
+git push -u origin main

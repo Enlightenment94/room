@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ws-client</title>
+    <link rel="stylesheet" href="style.css">
+    <script src='js/jsencrypt.min.js'></script>
+    <script src="js/forge.min.js"></script>
+    <script src="js/crypto-js.min.js"></script>
+    <script src="js/client.js"></script>
+</head>
+<body>
+    <div id="logo">
+        <center>
+            <img src="Room1.jpeg" width="200" height="200"/>
+        </center>
+    </div>
+    
+    <div id='loginWindow'>
+        <center>
+            <div id='header'><center>RooM</center></div>
+            <input id='password' type='text' value='backend219'/>
+            <button onclick="connect()">login</button>
+        </center>
+    </div>
+
+    <div id='content'>
+        <span style="display: none;" id="info">
+            <div id='my' style='font-weight: bold;'></div>
+
+            <div class='col100'>
+                <b>MyPrivate:</b></br>
+                <div id='myPrivKey'></div>
+            </div>
+
+            <div class='col100'>
+                <b>MyPublic:</b></br>
+                <div id='myPubKey'></div>
+            </div>
+
+            <div class='col100'>
+                <b>Reciver:</b></br>
+                <div id='reciverPubKey'></div>
+                <input id='client' style='width: 100%;'/>
+            </div>
+        </span>
+
+        <h1 style="text-align: center;">407</h1>
+
+        <div id="receiver"></div>
+
+        <div id='messages'></div>    
+
+        <div id='window'>
+            <textarea id='msg'>messag435435e</textarea>
+        </div>
+
+        <div style="display: flex;" class="col100">
+            <button id="btn-send" class="btn-clients btn-down" onclick='send()'>send</button>
+            <button id="btn-load-clients" style="display: block;" class="btn-clients btn-down" onclick='clients()'>clients</button>
+            <button style="display: none;" class="btn-clients btn-down" onclick='plsKey()'>plsKey</button>
+            <button class="btn-clients btn-down" onclick='clean()'>clean</button>
+        </div>
+
+        <div id='clients' class="col100"></div>
+
+    </div>
+    <script type="text/javascript">
+        var encrypt = new JSEncrypt({default_key_size: 2048});
+        encrypt.getKey();
+        
+        var privateKey = encrypt.getPrivateKey();
+        var publicKey = encrypt.getPublicKey();
+        console.log(privateKey);
+        console.log(publicKey);
+        
+        document.getElementById("myPrivKey").innerHTML = privateKey;
+        document.getElementById("myPubKey").innerHTML = publicKey;
+    </script>
+</body>
+</html>

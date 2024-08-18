@@ -1,0 +1,18 @@
+RewriteEngine On
+
+AddType application/javascript .js
+AddType application/json .json
+AddType text/css .css
+
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType application/json .json
+  AddType text/css .css
+</IfModule>
+
+RewriteCond %{HTTPS} off
+RewriteRule ^ - [L,QSA]
+
+<FilesMatch "\.map$">
+  Require all granted
+</FilesMatch>

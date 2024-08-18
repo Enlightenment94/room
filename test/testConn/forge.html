@@ -1,0 +1,19 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/node-forge/0.10.0/forge.min.js"></script>
+
+<script>
+var pki = forge.pki;
+
+var rsa = forge.pki.rsa;
+rsa.generateKeyPair({ bits: 2048, e: 0x10001 }, function(err, keypair) {
+  if (err) throw err;
+  var publicKey = pki.publicKeyToPem(keypair.publicKey);
+  var privateKey = pki.privateKeyToPem(keypair.privateKey);
+
+  var encrypted = keypair.publicKey.encrypt(dataToEncrypt);
+
+  var decrypted = keypair.privateKey.decrypt(encrypted);
+
+  console.log(decrypted);
+});
+
+</script>
